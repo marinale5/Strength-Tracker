@@ -1,0 +1,30 @@
+{
+  "name": "strength-tracker",
+  "version": "1.0.0",
+  "description": "Full-stack workout tracker app",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run dev -w backend\" \"npm run dev -w frontend\"",
+    "backend:dev": "npm run dev -w backend",
+    "backend:start": "npm start -w backend",
+    "frontend:dev": "npm run dev -w frontend",
+    "backend:install": "npm install -w backend",
+    "frontend:install": "npm install -w frontend",
+    "install-all": "npm install && npm run backend:install && npm run frontend:install"
+  },
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "keywords": [
+    "fitness",
+    "workout",
+    "tracker",
+    "gamification"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.0.0"
+  }
+}

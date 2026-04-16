@@ -1,0 +1,27 @@
+node_modules/
+.expo/
+.DS_Store
+*.log
+*.jks
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+web-build/
+dist/
+build/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
