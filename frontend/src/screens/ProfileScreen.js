@@ -9,8 +9,9 @@ import {
 } from 'react-native';
 import { authAPI } from '../api/client';
 
-export default function ProfileScreen({ user, onLogout }) {
+export default function ProfileScreen({ user, onLogout, navigation }) {
   const [loading, setLoading] = useState(false);
+  const [stats, setStats] = useState({ current_streak: user.current_streak || 0, longest_streak: user.longest_streak || 0 });
 
   const handleLogout = async () => {
     Alert.alert('Logout', 'Are you sure you want to logout?', [
@@ -62,6 +63,26 @@ export default function ProfileScreen({ user, onLogout }) {
           <Text style={styles.statLabel}>Level</Text>
           <Text style={styles.statNumber}>{user.level}</Text>
         </View>
+        <View style={styles.statCard}>
+          <Text style={styles.statLabel}>Streak</Text>
+          <Text style={styles.statNumber}>🔥 {stats.current_streak}</Text>
+        </View>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Gamification</Text>
+        <TouchableOpacity
+          style={styles.menuItem}
+          onPress={() => navigation.navigate('Achievements')}
+        >
+          <Text style={styles.menuText}>🏅 Achievements</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.menuItem}
+          onPress={() => navigation.navigate('PersonalRecords')}
+        >
+          <Text style={styles.menuText}>🏆 Personal Records</Text>
+        </TouchableOpacity>
       </View>
 
       <View style={styles.section}>

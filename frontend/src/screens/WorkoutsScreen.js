@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   View,
+  Image,
   Text,
   FlatList,
   TouchableOpacity,
@@ -8,20 +9,25 @@ import {
   ActivityIndicator,
   Alert,
 } from 'react-native';
-import { workoutAPI } from '../api/client';
+import { workoutAPI, gamificationAPI } from '../api/client';
 
 export default function WorkoutsScreen() {
   const [workouts, setWorkouts] = useState([]);
+  const [prs, setPrs] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchWorkouts();
+    fetchData();
   }, []);
 
-  const fetchWorkouts = async () => {
+  const fetchData = async () => {
     try {
-      const response = await workoutAPI.getUserWorkouts();
-      setWorkouts(response.data);
+      const [workoutsRes, prsRes] = await Promise.all([
+        workoutAPI.getUserWorkouts(),
+        gamificationAPI.getPRs()
+      ]);
+      setWorkouts(workoutsRes.data);
+      setPrs(prsRes.data);
     } catch (error) {
       Alert.alert('Error', 'Failed to fetch workouts');
     } finally {
@@ -57,8 +63,15 @@ export default function WorkoutsScreen() {
     }
   };
 
-  const renderWorkout = ({ item }) => (
+  const renderWorkout = ({ item }) => {
+    const isPR = prs.some(pr => pr.workout_id === item.id);
+    return (
     <View style={styles.workoutCard}>
+      {isPR && (
+        <View style={styles.prBadge}>
+          <Text style={styles.prBadgeText}>🏆 PERSONAL RECORD</Text>
+        </View>
+      )}
       <View style={styles.workoutHeader}>
         <View>
           <Text style={styles.exerciseName}>{item.exercise_name}</Text>
@@ -94,7 +107,8 @@ export default function WorkoutsScreen() {
         </TouchableOpacity>
       </View>
     </View>
-  );
+    );
+  };
 
   if (loading) {
     return (
@@ -124,6 +138,19 @@ export default function WorkoutsScreen() {
 }
 
 const styles = StyleSheet.create({
+  prBadge: {
+    backgroundColor: '#FFD700',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 4,
+    alignSelf: 'flex-start',
+    marginBottom: 8,
+  },
+  prBadgeText: {
+    fontSize: 10,
+    fontWeight: 'bold',
+    color: '#000',
+  },
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',

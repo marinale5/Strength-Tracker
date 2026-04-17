@@ -9,6 +9,8 @@ import WorkoutsScreen from '../screens/WorkoutsScreen';
 import LeaderboardScreen from '../screens/LeaderboardScreen';
 import FriendsScreen from '../screens/FriendsScreen';
 import ProfileScreen from '../screens/ProfileScreen';
+import AchievementsScreen from '../screens/AchievementsScreen';
+import PersonalRecordsScreen from '../screens/PersonalRecordsScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -96,8 +98,19 @@ function ProfileStackNavigator({ user, onLogout }) {
     >
       <Stack.Screen
         name="ProfileView"
-        component={() => <ProfileScreen user={user} onLogout={onLogout} />}
         options={{ title: 'Profile' }}
+      >
+        {props => <ProfileScreen {...props} user={user} onLogout={onLogout} />}
+      </Stack.Screen>
+      <Stack.Screen
+        name="Achievements"
+        component={AchievementsScreen}
+        options={{ title: 'Achievements' }}
+      />
+      <Stack.Screen
+        name="PersonalRecords"
+        component={PersonalRecordsScreen}
+        options={{ title: 'Personal Records' }}
       />
     </Stack.Navigator>
   );
