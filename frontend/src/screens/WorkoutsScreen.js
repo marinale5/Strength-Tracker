@@ -120,6 +120,7 @@ export default function WorkoutsScreen() {
 
   return (
     <View style={styles.container}>
+      <BossBattle />
       <Text style={styles.title}>My Workouts</Text>
       {workouts.length === 0 ? (
         <View style={styles.emptyState}>

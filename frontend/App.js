@@ -36,6 +36,15 @@ export default function App() {
     setIsAuthenticated(true);
   };
 
+  const refreshUser = async () => {
+    try {
+      const response = await authAPI.getCurrentUser();
+      setUser(response.data);
+    } catch (error) {
+      console.error('Refresh user error:', error);
+    }
+  };
+
   const handleLogout = () => {
     SecureStore.deleteItemAsync('authToken');
     setUser(null);
@@ -51,7 +60,7 @@ export default function App() {
   }
 
   return isAuthenticated ? (
-    <AppNavigator user={user} onLogout={handleLogout} />
+    <AppNavigator user={user} onLogout={handleLogout} refreshUser={refreshUser} />
   ) : (
     <AuthNavigator onLoginSuccess={handleLoginSuccess} />
   );

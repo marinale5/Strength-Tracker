@@ -33,7 +33,7 @@ function WorkoutStackNavigator() {
   );
 }
 
-function LogWorkoutStackNavigator() {
+function LogWorkoutStackNavigator({ refreshUser }) {
   return (
     <Stack.Navigator
       screenOptions={{
@@ -44,9 +44,10 @@ function LogWorkoutStackNavigator() {
     >
       <Stack.Screen
         name="LogWorkout"
-        component={LogWorkoutScreen}
         options={{ title: 'Log Workout' }}
-      />
+      >
+        {props => <LogWorkoutScreen {...props} onWorkoutLogged={refreshUser} />}
+      </Stack.Screen>
     </Stack.Navigator>
   );
 }
@@ -116,7 +117,7 @@ function ProfileStackNavigator({ user, onLogout }) {
   );
 }
 
-export function AppNavigator({ user, onLogout }) {
+export function AppNavigator({ user, onLogout, refreshUser }) {
   return (
     <NavigationContainer>
       <Tab.Navigator
@@ -141,12 +142,13 @@ export function AppNavigator({ user, onLogout }) {
         />
         <Tab.Screen
           name="LogWorkout"
-          component={LogWorkoutStackNavigator}
           options={{
             tabBarLabel: 'Log',
             tabBarIcon: ({ color }) => <Text style={{ fontSize: 20, color }}>➕</Text>,
           }}
-        />
+        >
+          {() => <LogWorkoutStackNavigator refreshUser={refreshUser} />}
+        </Tab.Screen>
         <Tab.Screen
           name="Leaderboard"
           component={LeaderboardStackNavigator}

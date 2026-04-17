@@ -111,6 +111,28 @@ const workoutController = {
     }
   },
 
+  // Templates
+  getTemplates: async (req, res) => {
+    try {
+      const userId = req.user.id;
+      const templates = await Routine.getForUser(userId);
+      res.json(templates);
+    } catch (err) {
+      res.status(500).json({ error: 'Failed to get templates' });
+    }
+  },
+
+  saveTemplate: async (req, res) => {
+    try {
+      const userId = req.user.id;
+      const { name, exercises } = req.body;
+      const template = await Routine.create(userId, name, exercises);
+      res.status(201).json(template);
+    } catch (err) {
+      res.status(500).json({ error: 'Failed to save template' });
+    }
+  },
+
   // Delete a workout
   deleteWorkout: async (req, res) => {
     try {
