@@ -42,9 +42,20 @@ export default function LogWorkoutScreen() {
         sets: parseInt(formData.sets),
         reps: parseInt(formData.reps),
         notes: formData.notes,
+        clientDate: new Date().toISOString(),
       });
 
-      Alert.alert('Success', response.data.message);
+      let alertMessage = response.data.message;
+      if (response.data.pr) {
+        alertMessage += "\n\n🏆 New Personal Record!";
+      }
+      if (response.data.achievements?.length > 0) {
+        response.data.achievements.forEach(a => {
+          alertMessage += `\n\n🌟 Achievement Unlocked: ${a.name}`;
+        });
+      }
+
+      Alert.alert('Success', alertMessage);
       // Clear form
       setFormData({
         exerciseName: '',

@@ -9,6 +9,7 @@ require('./config/passport');
 const authRoutes = require('./routes/auth');
 const workoutRoutes = require('./routes/workouts');
 const friendRoutes = require('./routes/friends');
+const gamificationRoutes = require('./routes/gamification');
 
 const app = express();
 
@@ -38,6 +39,7 @@ app.use(passport.session());
 app.use('/auth', authRoutes);
 app.use('/workouts', workoutRoutes);
 app.use('/friends', friendRoutes);
+app.use('/gamification', gamificationRoutes);
 
 // Health check
 app.get('/health', (req, res) => {
