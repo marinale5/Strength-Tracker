@@ -40,6 +40,8 @@ export const workoutAPI = {
     api.post('/workouts/share', { workoutId, message }),
   deleteWorkout: (workoutId) =>
     api.delete(`/workouts/${workoutId}`),
+  getTemplates: () => api.get('/workouts/templates'),
+  saveTemplate: (data) => api.post('/workouts/templates', data),
 };
 
 export const friendAPI = {
@@ -53,12 +55,23 @@ export const friendAPI = {
     api.delete(`/friends/${friendId}`),
   getFriends: () =>
     api.get('/friends'),
+  getLeaderboard: (limit = 50, seasonId = null) =>
+    api.get('/friends/leaderboard', { params: { limit, seasonId } }),
   getPendingRequests: () =>
     api.get('/friends/pending'),
   getFriendWorkouts: () =>
     api.get('/friends/workouts'),
   getLeaderboard: (limit = 50) =>
     api.get('/friends/leaderboard', { params: { limit } }),
+};
+
+export const gamificationAPI = {
+  getAchievements: () => api.get('/gamification/achievements'),
+  getPRs: () => api.get('/gamification/prs'),
+  getStats: () => api.get('/gamification/stats'),
+  getMuscleHeatmap: () => api.get('/gamification/heatmap'),
+  getActiveGoals: () => api.get('/gamification/active-goals'),
+  getSeasons: () => api.get('/gamification/seasons'),
 };
 
 export default api;

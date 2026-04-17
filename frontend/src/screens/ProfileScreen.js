@@ -8,9 +8,14 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { authAPI } from '../api/client';
+import MuscleHeatmap from '../components/MuscleHeatmap';
+import { useTheme } from '../context/ThemeContext';
+import api from '../api/client';
 
-export default function ProfileScreen({ user, onLogout }) {
+export default function ProfileScreen({ user, onLogout, navigation }) {
+  const { theme, toggleTheme, colors } = useTheme();
   const [loading, setLoading] = useState(false);
+  const [stats, setStats] = useState({ current_streak: user.current_streak || 0, longest_streak: user.longest_streak || 0 });
 
   const handleLogout = async () => {
     Alert.alert('Logout', 'Are you sure you want to logout?', [
@@ -42,16 +47,21 @@ export default function ProfileScreen({ user, onLogout }) {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.profileHeader}>
         <View style={styles.avatarContainer}>
           <Text style={styles.avatar}>👤</Text>
+          <View style={[styles.levelBadge, { backgroundColor: user.level >= 50 ? '#E5E4E2' : (user.level >= 20 ? '#FFD700' : (user.level >= 10 ? '#C0C0C0' : '#CD7F32')) }]}>
+            <Text style={styles.levelText}>{user.level}</Text>
+          </View>
         </View>
         <View style={styles.profileInfo}>
           <Text style={styles.username}>{user.username}</Text>
           <Text style={styles.email}>{user.email}</Text>
         </View>
       </View>
+
+      <MuscleHeatmap />
 
       <View style={styles.statsContainer}>
         <View style={styles.statCard}>
@@ -62,18 +72,76 @@ export default function ProfileScreen({ user, onLogout }) {
           <Text style={styles.statLabel}>Level</Text>
           <Text style={styles.statNumber}>{user.level}</Text>
         </View>
+        <View style={styles.statCard}>
+          <Text style={styles.statLabel}>Streak</Text>
+          <Text style={styles.statNumber}>🔥 {stats.current_streak}</Text>
+        </View>
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Account</Text>
+        <Text style={styles.sectionTitle}>Gamification</Text>
+        <TouchableOpacity
+          style={styles.menuItem}
+          onPress={() => navigation.navigate('Achievements')}
+        >
+          <Text style={styles.menuText}>🏅 Achievements</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.menuItem}
+          onPress={() => navigation.navigate('PersonalRecords')}
+        >
+          <Text style={styles.menuText}>🏆 Personal Records</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.menuItem}
+          onPress={() => navigation.navigate('PlateCalculator')}
+        >
+          <Text style={styles.menuText}>🔢 Plate Calculator</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.menuItem}
+          onPress={() => navigation.navigate('WorkoutTemplates')}
+        >
+          <Text style={styles.menuText}>📋 My Routines</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={[styles.section, { backgroundColor: colors.surface }]}>
+        <Text style={[styles.sectionTitle, { color: colors.subtext }]}>Account</Text>
+        <TouchableOpacity style={styles.menuItem} onPress={toggleTheme}>
+          <Text style={[styles.menuText, { color: colors.text }]}>
+            {theme === 'light' ? '🌙 Dark Mode' : '☀️ Light Mode'}
+          </Text>
+        </TouchableOpacity>
         <TouchableOpacity style={styles.menuItem}>
-          <Text style={styles.menuText}>📝 Update Profile</Text>
+          <Text style={[styles.menuText, { color: colors.text }]}>📝 Update Profile</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.menuItem}>
           <Text style={styles.menuText}>🔒 Privacy Settings</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.menuItem}>
           <Text style={styles.menuText}>🎯 Goals</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.menuItem} onPress={() => {
+          Alert.prompt(
+            "Update Body Weight",
+            "Enter your current weight (lbs)",
+            [
+              { text: "Cancel", style: "cancel" },
+              { text: "Update", onPress: async (weight) => {
+                try {
+                  await api.post('/auth/update-weight', { weight });
+                  Alert.alert("Success", "Weight updated!");
+                } catch (e) {
+                  Alert.alert("Error", "Failed to update weight");
+                }
+              }}
+            ],
+            "plain-text",
+            user.body_weight?.toString()
+          );
+        }}>
+          <Text style={styles.menuText}>⚖️ Update Body Weight</Text>
         </TouchableOpacity>
       </View>
 
@@ -95,7 +163,6 @@ export default function ProfileScreen({ user, onLogout }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
     padding: 16,
   },
   centered: {
@@ -124,9 +191,28 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 16,
+    position: 'relative',
   },
   avatar: {
     fontSize: 32,
+  },
+  levelBadge: {
+    position: 'absolute',
+    bottom: -5,
+    right: -5,
+    backgroundColor: '#FFD700',
+    borderRadius: 15,
+    width: 30,
+    height: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#fff',
+  },
+  levelText: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#333',
   },
   profileInfo: {
     flex: 1,

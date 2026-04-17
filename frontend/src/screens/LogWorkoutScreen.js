@@ -10,18 +10,37 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { workoutAPI } from '../api/client';
+import RestTimer from '../components/RestTimer';
 
-export default function LogWorkoutScreen() {
+export default function LogWorkoutScreen({ onWorkoutLogged, route }) {
   const [loading, setLoading] = useState(false);
+
+  // Handle template selection
+  const template = route?.params?.template;
+  const isNewTemplate = route?.params?.isNewTemplate;
+
   const [formData, setFormData] = useState({
-    exerciseName: '',
+    exerciseName: template?.exercises[0]?.name || '',
     muscleGroup: 'Chest',
     equipment: '',
     weight: '',
-    sets: '',
-    reps: '',
+    sets: template?.exercises[0]?.sets?.toString() || '',
+    reps: template?.exercises[0]?.reps?.toString() || '',
     notes: '',
+    saveAsTemplate: false,
+    templateName: '',
   });
+
+  React.useEffect(() => {
+    if (template) {
+      setFormData(prev => ({
+        ...prev,
+        exerciseName: template.exercises[0]?.name || '',
+        sets: template.exercises[0]?.sets?.toString() || '',
+        reps: template.exercises[0]?.reps?.toString() || '',
+      }));
+    }
+  }, [template]);
 
   const muscleGroups = ['Chest', 'Back', 'Legs', 'Shoulders', 'Arms', 'Core'];
   const equipmentOptions = ['Barbell', 'Dumbbells', 'Cable Machine', 'Machine', 'Bodyweight'];
@@ -42,9 +61,38 @@ export default function LogWorkoutScreen() {
         sets: parseInt(formData.sets),
         reps: parseInt(formData.reps),
         notes: formData.notes,
+        clientDate: new Date().toISOString(),
       });
 
-      Alert.alert('Success', response.data.message);
+      let alertMessage = response.data.message;
+
+      if (formData.saveAsTemplate && formData.templateName.trim()) {
+        try {
+          await workoutAPI.saveTemplate({
+            name: formData.templateName,
+            exercises: [{
+              exerciseName: formData.exerciseName,
+              sets: parseInt(formData.sets),
+              reps: parseInt(formData.reps)
+            }]
+          });
+          alertMessage += "\n\n📋 Routine saved!";
+        } catch (e) {
+          console.error("Failed to save template:", e);
+        }
+      }
+
+      if (response.data.pr) {
+        alertMessage += "\n\n🏆 New Personal Record!";
+      }
+      if (response.data.achievements?.length > 0) {
+        response.data.achievements.forEach(a => {
+          alertMessage += `\n\n🌟 Achievement Unlocked: ${a.name}`;
+        });
+      }
+
+      Alert.alert('Success', alertMessage);
+      if (onWorkoutLogged) onWorkoutLogged();
       // Clear form
       setFormData({
         exerciseName: '',
@@ -177,6 +225,26 @@ export default function LogWorkoutScreen() {
         placeholderTextColor="#999"
       />
 
+      {isNewTemplate || (
+        <View style={styles.templateOptions}>
+          <TouchableOpacity
+            style={styles.checkboxRow}
+            onPress={() => setFormData({...formData, saveAsTemplate: !formData.saveAsTemplate})}
+          >
+            <Text style={styles.checkboxIcon}>{formData.saveAsTemplate ? '✅' : '⬜'}</Text>
+            <Text style={styles.checkboxLabel}>Save as Routine?</Text>
+          </TouchableOpacity>
+          {formData.saveAsTemplate && (
+            <TextInput
+              style={styles.input}
+              placeholder="Routine Name (e.g. Chest Day)"
+              value={formData.templateName}
+              onChangeText={(text) => setFormData({...formData, templateName: text})}
+            />
+          )}
+        </View>
+      )}
+
       <TouchableOpacity
         style={[styles.button, loading && styles.buttonDisabled]}
         onPress={handleLogWorkout}
@@ -188,11 +256,34 @@ export default function LogWorkoutScreen() {
           <Text style={styles.buttonText}>Log Workout</Text>
         )}
       </TouchableOpacity>
+
+      <Text style={styles.label}>Rest Timer</Text>
+      <RestTimer initialSeconds={60} />
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
+  templateOptions: {
+    backgroundColor: '#eee',
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 16,
+  },
+  checkboxRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  checkboxIcon: {
+    fontSize: 18,
+    marginRight: 8,
+  },
+  checkboxLabel: {
+    fontSize: 14,
+    color: '#333',
+    fontWeight: '500',
+  },
   container: {
     flex: 1,
     padding: 16,

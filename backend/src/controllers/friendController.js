@@ -111,8 +111,8 @@ const friendController = {
   // Get leaderboard
   getLeaderboard: async (req, res) => {
     try {
-      const { limit = 50 } = req.query;
-      const leaderboard = await User.getLeaderboard(parseInt(limit));
+      const { limit = 50, seasonId } = req.query;
+      const leaderboard = await User.getLeaderboard(parseInt(limit), seasonId);
       res.json(leaderboard);
     } catch (err) {
       console.error('Get leaderboard error:', err);

@@ -6,20 +6,28 @@ import {
   StyleSheet,
   ActivityIndicator,
   Alert,
+  ScrollView,
+  TouchableOpacity,
 } from 'react-native';
-import { friendAPI } from '../api/client';
+import { friendAPI, gamificationAPI } from '../api/client';
 
 export default function LeaderboardScreen() {
   const [leaderboard, setLeaderboard] = useState([]);
+  const [seasons, setSeasons] = useState([]);
+  const [selectedSeason, setSelectedSeason] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchLeaderboard();
-  }, []);
+    fetchData();
+  }, [selectedSeason]);
 
-  const fetchLeaderboard = async () => {
+  const fetchData = async () => {
     try {
-      const response = await friendAPI.getLeaderboard(100);
+      if (seasons.length === 0) {
+        const seasonsRes = await gamificationAPI.getSeasons();
+        setSeasons(seasonsRes.data);
+      }
+      const response = await friendAPI.getLeaderboard(100, selectedSeason);
       setLeaderboard(response.data);
     } catch (error) {
       Alert.alert('Error', 'Failed to fetch leaderboard');
@@ -60,7 +68,26 @@ export default function LeaderboardScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Leaderboard</Text>
+      <View style={styles.header}>
+        <Text style={styles.title}>Leaderboard</Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.seasonToggle}>
+          <TouchableOpacity
+            style={[styles.seasonButton, !selectedSeason && styles.activeSeason]}
+            onPress={() => setSelectedSeason(null)}
+          >
+            <Text style={[styles.seasonText, !selectedSeason && styles.activeSeasonText]}>All-Time</Text>
+          </TouchableOpacity>
+          {seasons.map(s => (
+            <TouchableOpacity
+              key={s.id}
+              style={[styles.seasonButton, selectedSeason === s.id && styles.activeSeason]}
+              onPress={() => setSelectedSeason(s.id)}
+            >
+              <Text style={[styles.seasonText, selectedSeason === s.id && styles.activeSeasonText]}>{s.name}</Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
       <FlatList
         data={leaderboard}
         renderItem={renderUser}
@@ -83,11 +110,35 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  header: {
+    marginBottom: 16,
+  },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    marginBottom: 16,
     color: '#000',
+    marginBottom: 12,
+  },
+  seasonToggle: {
+    flexDirection: 'row',
+  },
+  seasonButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: '#eee',
+    marginRight: 8,
+  },
+  activeSeason: {
+    backgroundColor: '#4CAF50',
+  },
+  seasonText: {
+    fontSize: 12,
+    color: '#666',
+  },
+  activeSeasonText: {
+    color: '#fff',
+    fontWeight: 'bold',
   },
   list: {
     paddingBottom: 32,

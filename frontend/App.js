@@ -4,6 +4,7 @@ import * as SecureStore from 'expo-secure-store';
 import { authAPI } from './src/api/client';
 import { AuthNavigator } from './src/navigation/AuthNavigator';
 import { AppNavigator } from './src/navigation/AppNavigator';
+import { ThemeProvider } from './src/context/ThemeContext';
 
 export default function App() {
   const [user, setUser] = useState(null);
@@ -36,6 +37,15 @@ export default function App() {
     setIsAuthenticated(true);
   };
 
+  const refreshUser = async () => {
+    try {
+      const response = await authAPI.getCurrentUser();
+      setUser(response.data);
+    } catch (error) {
+      console.error('Refresh user error:', error);
+    }
+  };
+
   const handleLogout = () => {
     SecureStore.deleteItemAsync('authToken');
     setUser(null);
@@ -51,7 +61,9 @@ export default function App() {
   }
 
   return isAuthenticated ? (
-    <AppNavigator user={user} onLogout={handleLogout} />
+    <ThemeProvider user={user}>
+      <AppNavigator user={user} onLogout={handleLogout} refreshUser={refreshUser} />
+    </ThemeProvider>
   ) : (
     <AuthNavigator onLoginSuccess={handleLoginSuccess} />
   );
