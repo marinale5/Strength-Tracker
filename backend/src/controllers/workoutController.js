@@ -1,11 +1,13 @@
 const Workout = require('../models/Workout');
 const User = require('../models/User');
+const Achievement = require('../models/Achievement');
+const PersonalRecord = require('../models/PersonalRecord');
 
 const workoutController = {
   // Log a workout
   logWorkout: async (req, res) => {
     try {
-      const { exerciseName, muscleGroup, equipment, weight, weightUnit, sets, reps, notes } = req.body;
+      const { exerciseName, muscleGroup, equipment, weight, weightUnit, sets, reps, notes, clientDate } = req.body;
       const userId = req.user.id;
 
       if (!exerciseName || !muscleGroup || !sets || !reps) {
@@ -24,10 +26,29 @@ const workoutController = {
       });
 
       // Award points to user
-      await User.updatePoints(userId, workout.points_earned);
+      const updatedUser = await User.updatePoints(userId, workout.points_earned);
+
+      // Update streak
+      const userWithStreak = await User.updateStreak(userId, clientDate ? clientDate.split('T')[0] : null);
+
+      // Check for PRs
+      const prResults = await PersonalRecord.updateIfBetter(userId, workout);
+
+      // Check for Achievements
+      const workoutCount = await User.getWorkoutCount(userId);
+      const stats = {
+        workout_count: workoutCount,
+        current_streak: userWithStreak.current_streak
+      };
+      const newAchievements = await Achievement.checkAndAward(userId, workout, stats, clientDate);
 
       res.status(201).json({
         workout,
+        points_earned: workout.points_earned,
+        new_level: updatedUser.level,
+        streak: userWithStreak.current_streak,
+        pr: prResults,
+        achievements: newAchievements,
         message: `Workout logged! You earned ${workout.points_earned} points!`,
       });
     } catch (err) {

@@ -61,4 +61,10 @@ export const friendAPI = {
     api.get('/friends/leaderboard', { params: { limit } }),
 };
 
+export const gamificationAPI = {
+  getAchievements: () => api.get('/gamification/achievements'),
+  getPRs: () => api.get('/gamification/prs'),
+  getStats: () => api.get('/gamification/stats'),
+};
+
 export default api;
