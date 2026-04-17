@@ -11,6 +11,8 @@ import FriendsScreen from '../screens/FriendsScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import AchievementsScreen from '../screens/AchievementsScreen';
 import PersonalRecordsScreen from '../screens/PersonalRecordsScreen';
+import PlateCalculator from '../screens/PlateCalculator';
+import WorkoutTemplatesScreen from '../screens/WorkoutTemplatesScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -33,7 +35,7 @@ function WorkoutStackNavigator() {
   );
 }
 
-function LogWorkoutStackNavigator() {
+function LogWorkoutStackNavigator({ refreshUser }) {
   return (
     <Stack.Navigator
       screenOptions={{
@@ -44,9 +46,10 @@ function LogWorkoutStackNavigator() {
     >
       <Stack.Screen
         name="LogWorkout"
-        component={LogWorkoutScreen}
         options={{ title: 'Log Workout' }}
-      />
+      >
+        {props => <LogWorkoutScreen {...props} onWorkoutLogged={refreshUser} />}
+      </Stack.Screen>
     </Stack.Navigator>
   );
 }
@@ -112,11 +115,21 @@ function ProfileStackNavigator({ user, onLogout }) {
         component={PersonalRecordsScreen}
         options={{ title: 'Personal Records' }}
       />
+      <Stack.Screen
+        name="PlateCalculator"
+        component={PlateCalculator}
+        options={{ title: 'Plate Calculator' }}
+      />
+      <Stack.Screen
+        name="WorkoutTemplates"
+        component={WorkoutTemplatesScreen}
+        options={{ title: 'My Routines' }}
+      />
     </Stack.Navigator>
   );
 }
 
-export function AppNavigator({ user, onLogout }) {
+export function AppNavigator({ user, onLogout, refreshUser }) {
   return (
     <NavigationContainer>
       <Tab.Navigator
@@ -141,12 +154,13 @@ export function AppNavigator({ user, onLogout }) {
         />
         <Tab.Screen
           name="LogWorkout"
-          component={LogWorkoutStackNavigator}
           options={{
             tabBarLabel: 'Log',
             tabBarIcon: ({ color }) => <Text style={{ fontSize: 20, color }}>➕</Text>,
           }}
-        />
+        >
+          {() => <LogWorkoutStackNavigator refreshUser={refreshUser} />}
+        </Tab.Screen>
         <Tab.Screen
           name="Leaderboard"
           component={LeaderboardStackNavigator}

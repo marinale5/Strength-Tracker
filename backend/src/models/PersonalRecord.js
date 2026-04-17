@@ -14,6 +14,10 @@ class PersonalRecord {
     const { exercise_name, weight, reps, sets, id: workoutId } = workout;
     const tonnage = (weight || 0) * reps * sets;
 
+    // Fetch user body weight for relative strength
+    const userResult = await pool.query('SELECT body_weight FROM users WHERE id = $1', [userId]);
+    const bodyWeight = parseFloat(userResult.rows[0].body_weight) || 180; // Default if not set
+
     // Brzycki Formula for E1RM: weight * (36 / (37 - reps))
     // Limit reps to 30 to avoid division by zero or unrealistic results
     const cappedReps = Math.min(reps, 30);
@@ -26,11 +30,14 @@ class PersonalRecord {
     );
     const existing = existingResult.rows[0];
 
+    const relativeStrength = weight / bodyWeight;
+
     const newRecord = {
       isNewBestWeight: !existing || weight > existing.best_weight,
       isNewBestReps: !existing || (reps > existing.best_rep_count),
       isNewMaxTonnage: !existing || tonnage > existing.max_tonnage,
-      isNewE1RM: !existing || e1rm > existing.estimated_one_rep_max
+      isNewE1RM: !existing || e1rm > existing.estimated_one_rep_max,
+      isNewRelativeStrength: !existing || relativeStrength > (existing.best_weight / bodyWeight)
     };
 
     if (!existing) {

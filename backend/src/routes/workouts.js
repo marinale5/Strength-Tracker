@@ -15,6 +15,10 @@ router.get('/recent', workoutController.getRecentWorkouts);
 // Share workout
 router.post('/share', authMiddleware, workoutController.shareWorkout);
 
+// Templates
+router.get('/templates', authMiddleware, workoutController.getTemplates);
+router.post('/templates', authMiddleware, workoutController.saveTemplate);
+
 // Delete workout
 router.delete('/:workoutId', authMiddleware, workoutController.deleteWorkout);
 

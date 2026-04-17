@@ -10,18 +10,34 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { workoutAPI } from '../api/client';
+import RestTimer from '../components/RestTimer';
 
-export default function LogWorkoutScreen() {
+export default function LogWorkoutScreen({ onWorkoutLogged, route }) {
   const [loading, setLoading] = useState(false);
+
+  // Handle template selection
+  const template = route?.params?.template;
+
   const [formData, setFormData] = useState({
-    exerciseName: '',
+    exerciseName: template?.exercises[0]?.name || '',
     muscleGroup: 'Chest',
     equipment: '',
     weight: '',
-    sets: '',
-    reps: '',
+    sets: template?.exercises[0]?.sets?.toString() || '',
+    reps: template?.exercises[0]?.reps?.toString() || '',
     notes: '',
   });
+
+  React.useEffect(() => {
+    if (template) {
+      setFormData(prev => ({
+        ...prev,
+        exerciseName: template.exercises[0]?.name || '',
+        sets: template.exercises[0]?.sets?.toString() || '',
+        reps: template.exercises[0]?.reps?.toString() || '',
+      }));
+    }
+  }, [template]);
 
   const muscleGroups = ['Chest', 'Back', 'Legs', 'Shoulders', 'Arms', 'Core'];
   const equipmentOptions = ['Barbell', 'Dumbbells', 'Cable Machine', 'Machine', 'Bodyweight'];
@@ -56,6 +72,7 @@ export default function LogWorkoutScreen() {
       }
 
       Alert.alert('Success', alertMessage);
+      if (onWorkoutLogged) onWorkoutLogged();
       // Clear form
       setFormData({
         exerciseName: '',
@@ -199,6 +216,9 @@ export default function LogWorkoutScreen() {
           <Text style={styles.buttonText}>Log Workout</Text>
         )}
       </TouchableOpacity>
+
+      <Text style={styles.label}>Rest Timer</Text>
+      <RestTimer initialSeconds={60} />
     </ScrollView>
   );
 }
