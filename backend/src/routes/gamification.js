@@ -12,7 +12,4 @@ router.get('/prs', authMiddleware, gamificationController.getPersonalRecords);
 // Get user stats (streak, etc.)
 router.get('/stats', authMiddleware, gamificationController.getUserStats);
 
-// Get active community goals
-router.get('/active-goals', authMiddleware, gamificationController.getActiveGoals);
-
 module.exports = router;

@@ -88,18 +88,6 @@ export default function ProfileScreen({ user, onLogout, navigation }) {
         >
           <Text style={styles.menuText}>🏆 Personal Records</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.menuItem}
-          onPress={() => navigation.navigate('PlateCalculator')}
-        >
-          <Text style={styles.menuText}>🔢 Plate Calculator</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.menuItem}
-          onPress={() => navigation.navigate('WorkoutTemplates')}
-        >
-          <Text style={styles.menuText}>📋 My Routines</Text>
-        </TouchableOpacity>
       </View>
 
       <View style={styles.section}>

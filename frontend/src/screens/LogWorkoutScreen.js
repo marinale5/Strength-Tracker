@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -14,9 +14,9 @@ import RestTimer from '../components/RestTimer';
 
 export default function LogWorkoutScreen({ onWorkoutLogged, route }) {
   const [loading, setLoading] = useState(false);
-
-  // Handle template selection
-  const template = route?.params?.template;
+  const weightInput = useRef(null);
+  const setsInput = useRef(null);
+  const repsInput = useRef(null);
 
   const [formData, setFormData] = useState({
     exerciseName: template?.exercises[0]?.name || '',
@@ -72,7 +72,6 @@ export default function LogWorkoutScreen({ onWorkoutLogged, route }) {
       }
 
       Alert.alert('Success', alertMessage);
-      if (onWorkoutLogged) onWorkoutLogged();
       // Clear form
       setFormData({
         exerciseName: '',
@@ -103,6 +102,9 @@ export default function LogWorkoutScreen({ onWorkoutLogged, route }) {
           setFormData({ ...formData, exerciseName: text })
         }
         placeholderTextColor="#999"
+        accessibilityLabel="Exercise Name"
+        returnKeyType="next"
+        onSubmitEditing={() => weightInput.current?.focus()}
       />
 
       <Text style={styles.label}>Muscle Group *</Text>
@@ -119,6 +121,9 @@ export default function LogWorkoutScreen({ onWorkoutLogged, route }) {
               formData.muscleGroup === muscle && styles.groupButtonActive,
             ]}
             onPress={() => setFormData({ ...formData, muscleGroup: muscle })}
+            accessibilityRole="button"
+            accessibilityLabel={muscle}
+            accessibilityState={{ selected: formData.muscleGroup === muscle }}
           >
             <Text
               style={[
@@ -146,6 +151,9 @@ export default function LogWorkoutScreen({ onWorkoutLogged, route }) {
               formData.equipment === equip && styles.groupButtonActive,
             ]}
             onPress={() => setFormData({ ...formData, equipment: equip })}
+            accessibilityRole="button"
+            accessibilityLabel={equip}
+            accessibilityState={{ selected: formData.equipment === equip }}
           >
             <Text
               style={[
@@ -161,35 +169,46 @@ export default function LogWorkoutScreen({ onWorkoutLogged, route }) {
 
       <Text style={styles.label}>Weight (lbs)</Text>
       <TextInput
+        ref={weightInput}
         style={styles.input}
         placeholder="e.g., 185"
         value={formData.weight}
         onChangeText={(text) => setFormData({ ...formData, weight: text })}
         keyboardType="decimal-pad"
         placeholderTextColor="#999"
+        accessibilityLabel="Weight in pounds"
+        returnKeyType="next"
+        onSubmitEditing={() => setsInput.current?.focus()}
       />
 
       <View style={styles.row}>
         <View style={styles.halfWidth}>
           <Text style={styles.label}>Sets *</Text>
           <TextInput
+            ref={setsInput}
             style={styles.input}
             placeholder="3"
             value={formData.sets}
             onChangeText={(text) => setFormData({ ...formData, sets: text })}
             keyboardType="number-pad"
             placeholderTextColor="#999"
+            accessibilityLabel="Number of sets"
+            returnKeyType="next"
+            onSubmitEditing={() => repsInput.current?.focus()}
           />
         </View>
         <View style={styles.halfWidth}>
           <Text style={styles.label}>Reps *</Text>
           <TextInput
+            ref={repsInput}
             style={styles.input}
             placeholder="10"
             value={formData.reps}
             onChangeText={(text) => setFormData({ ...formData, reps: text })}
             keyboardType="number-pad"
             placeholderTextColor="#999"
+            accessibilityLabel="Number of repetitions"
+            returnKeyType="done"
           />
         </View>
       </View>
@@ -203,12 +222,16 @@ export default function LogWorkoutScreen({ onWorkoutLogged, route }) {
         multiline
         numberOfLines={4}
         placeholderTextColor="#999"
+        accessibilityLabel="Notes about the workout"
+        returnKeyType="done"
       />
 
       <TouchableOpacity
         style={[styles.button, loading && styles.buttonDisabled]}
         onPress={handleLogWorkout}
         disabled={loading}
+        accessibilityRole="button"
+        accessibilityHint="Submits your workout log"
       >
         {loading ? (
           <ActivityIndicator color="#fff" />

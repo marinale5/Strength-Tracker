@@ -10,7 +10,6 @@ import {
   Alert,
 } from 'react-native';
 import { workoutAPI, gamificationAPI } from '../api/client';
-import BossBattle from '../components/BossBattle';
 
 export default function WorkoutsScreen() {
   const [workouts, setWorkouts] = useState([]);

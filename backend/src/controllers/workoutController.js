@@ -2,8 +2,6 @@ const Workout = require('../models/Workout');
 const User = require('../models/User');
 const Achievement = require('../models/Achievement');
 const PersonalRecord = require('../models/PersonalRecord');
-const CommunityGoal = require('../models/CommunityGoal');
-const Routine = require('../models/Routine');
 
 const workoutController = {
   // Log a workout
@@ -43,12 +41,6 @@ const workoutController = {
         current_streak: userWithStreak.current_streak
       };
       const newAchievements = await Achievement.checkAndAward(userId, workout, stats, clientDate);
-
-      // Contribute to community goals
-      const tonnage = workout.weight * workout.sets * workout.reps;
-      await CommunityGoal.contribute(userId, 'lbs', tonnage);
-      await CommunityGoal.contribute(userId, 'workouts_completed', 1);
-      await CommunityGoal.contribute(userId, 'total_points', workout.points_earned);
 
       res.status(201).json({
         workout,

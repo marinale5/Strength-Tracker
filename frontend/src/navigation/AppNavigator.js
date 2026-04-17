@@ -11,8 +11,6 @@ import FriendsScreen from '../screens/FriendsScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import AchievementsScreen from '../screens/AchievementsScreen';
 import PersonalRecordsScreen from '../screens/PersonalRecordsScreen';
-import PlateCalculator from '../screens/PlateCalculator';
-import WorkoutTemplatesScreen from '../screens/WorkoutTemplatesScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -114,16 +112,6 @@ function ProfileStackNavigator({ user, onLogout }) {
         name="PersonalRecords"
         component={PersonalRecordsScreen}
         options={{ title: 'Personal Records' }}
-      />
-      <Stack.Screen
-        name="PlateCalculator"
-        component={PlateCalculator}
-        options={{ title: 'Plate Calculator' }}
-      />
-      <Stack.Screen
-        name="WorkoutTemplates"
-        component={WorkoutTemplatesScreen}
-        options={{ title: 'My Routines' }}
       />
     </Stack.Navigator>
   );
