@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -22,12 +22,13 @@ export default function ProfileScreen({ user, onLogout, navigation }) {
         onPress: async () => {
           setLoading(true);
           try {
+            // Call logout API
             await authAPI.logout();
-            onLogout();
           } catch (error) {
-            Alert.alert('Error', 'Failed to logout');
+            console.log('Logout error (might be unauthenticated already):', error);
           } finally {
             setLoading(false);
+            onLogout();
           }
         },
       },
@@ -37,7 +38,7 @@ export default function ProfileScreen({ user, onLogout, navigation }) {
   if (!user) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#4CAF50" />
+        <Text style={styles.emptyText}>Loading profile...</Text>
       </View>
     );
   }
@@ -144,6 +145,16 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f5f5f5',
     padding: 16,
+  },
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#999',
+  },
   },
   centered: {
     flex: 1,

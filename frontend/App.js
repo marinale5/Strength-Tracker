@@ -30,10 +30,14 @@ export default function App() {
     }
   };
 
-  const handleLoginSuccess = (token, userData) => {
-    SecureStore.setItemAsync('authToken', token);
-    setUser(userData);
-    setIsAuthenticated(true);
+  const handleLoginSuccess = async (token, userData) => {
+    try {
+      await SecureStore.setItemAsync('authToken', token);
+      setUser(userData);
+      setIsAuthenticated(true);
+    } catch (error) {
+      console.error('Error saving auth token:', error);
+    }
   };
 
   const refreshUser = async () => {
@@ -45,10 +49,14 @@ export default function App() {
     }
   };
 
-  const handleLogout = () => {
-    SecureStore.deleteItemAsync('authToken');
-    setUser(null);
-    setIsAuthenticated(false);
+  const handleLogout = async () => {
+    try {
+      await SecureStore.deleteItemAsync('authToken');
+      setUser(null);
+      setIsAuthenticated(false);
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
   };
 
   if (loading) {

@@ -1,23 +1,13 @@
 const { Pool } = require('pg');
 require('dotenv').config();
 
-let pool;
-
-if (process.env.NODE_ENV === 'test') {
-  // Mock pool for testing if needed, or just let tests handle it
-  pool = {
-    query: jest.fn(),
-    on: jest.fn(),
-  };
-} else {
-  pool = new Pool({
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT,
-    database: process.env.DB_NAME,
-  });
-}
+const pool = new Pool({
+  user: process.env.DB_USER || 'postgres',
+  password: process.env.DB_PASSWORD || 'postgres',
+  host: process.env.DB_HOST || 'localhost',
+  port: process.env.DB_PORT || 5432,
+  database: process.env.DB_NAME || 'strength_tracker',
+});
 
 pool.on('error', (err) => {
   console.error('Unexpected error on idle client', err);

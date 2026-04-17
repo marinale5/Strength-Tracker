@@ -1,20 +1,54 @@
 import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, LinkingConfiguration } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { View, Text, TouchableOpacity, StyleSheet, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Alert, ActivityIndicator, Linking } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
-import { authAPI } from '../api/client';
+import * as WebBrowser from 'expo-web-browser';
 
 const Stack = createNativeStackNavigator();
 
-export function AuthNavigator({ onLoginSuccess }) {
-  const [loading, setLoading] = React.useState(false);
-
-  const handleGoogleLogin = async () => {
-    setLoading(true);
-    try {
-      // In a real app, this would open the OAuth flow
-      // For now, we'll show a placeholder
+const linking = {
+  prefixes: ['strengths-tracker://', 'http://localhost:19000', 'http://localhost:8081'],
+  config: {
+    screens: {
+      LoginCallback: '/auth/callback',
+    },
+  },const apiUrl = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:5000';
+      const authUrl = `${apiUrl}/auth/google`;
+      
+      // Open in web browser
+      const result = await WebBrowser.openBrowserAsync(authUrl);
+      
+      if (result.type === 'success') {
+        // Check for token in result URL
+        const tokensMatch = result.url?.match(/token=([^&]+)/);
+        const userIdMatch = result.url?.match(/userId=([^&]+)/);
+        
+        if (tokensMatch && userIdMatch) {
+          const token = decodeURIComponent(tokensMatch[1]);
+          await SecureStore.setItemAsync('authToken', token);
+          onLoginSuccess(token, { id: userIdMatch[1] });
+        }
+      const apiUrl = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:5000';
+      const authUrl = `${apiUrl}/auth/github`;
+      
+      // Open in web browser
+      const result = await WebBrowser.openBrowserAsync(authUrl);
+      
+      if (result.type === 'success') {
+        // Check for token in result URL
+        const tokensMatch = result.url?.match(/token=([^&]+)/);
+        const userIdMatch = result.url?.match(/userId=([^&]+)/);
+        
+        if (tokensMatch && userIdMatch) {
+          const token = decodeURIComponent(tokensMatch[1]);
+          await SecureSt linking={linking} fallback={<ActivityIndicator size="large" color="#4CAF50" />}ore.setItemAsync('authToken', token);
+          onLoginSuccess(token, { id: userIdMatch[1] });
+        }
+      }
+    } catch (error) {
+      Alert.alert('Error', 'GitHub login failed: ' + error.message);
+      console.error('GitHub login error:', errorr
       Alert.alert(
         'Google Login',
         'This would open Google OAuth in a real app. Check backend setup.'

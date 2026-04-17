@@ -1,6 +1,4 @@
-const express = require('express');
 const passport = require('passport');
-const LocalStrategy = require('passport-local').Strategy;
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const GitHubStrategy = require('passport-github2').Strategy;
 const User = require('../models/User');
@@ -77,5 +75,7 @@ passport.deserializeUser(async (id, done) => {
     done(err);
   }
 });
+
+module.exports = passport;
 
 module.exports = passport;

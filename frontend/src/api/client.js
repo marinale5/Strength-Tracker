@@ -1,7 +1,9 @@
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:5000';
+// Use IP for Android emulator, localhost for iOS/web
+const isAndroid = require('react-native/Libraries/Utilities/Platform').OS === 'android';
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || (isAndroid ? 'http://10.0.2.2:5000' : 'http://localhost:5000');
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -59,7 +61,8 @@ export const friendAPI = {
     api.get('/friends/workouts'),
   getLeaderboard: (limit = 50) =>
     api.get('/friends/leaderboard', { params: { limit } }),
-};
+};{ authAPI, workoutAPI, friendAPI };
+export 
 
 export const gamificationAPI = {
   getAchievements: () => api.get('/gamification/achievements'),
