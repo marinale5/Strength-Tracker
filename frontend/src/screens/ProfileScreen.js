@@ -7,7 +7,8 @@ import {
   Alert,
   ActivityIndicator,
 } from 'react-native';
-import { authAPI } from '../api/client';
+import api, { authAPI } from '../api/client';
+import MuscleHeatmap from '../components/MuscleHeatmap';
 
 export default function ProfileScreen({ user, onLogout, navigation }) {
   const [loading, setLoading] = useState(false);
@@ -154,12 +155,6 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 16,
     color: '#999',
-  },
-  },
-  centered: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   profileHeader: {
     backgroundColor: '#fff',
