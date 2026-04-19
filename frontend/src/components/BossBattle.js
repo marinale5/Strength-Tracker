@@ -31,7 +31,12 @@ export default function BossBattle() {
       <Text style={styles.title}>🐲 BOSS BATTLE: {goal.title}</Text>
       <Text style={styles.description}>{goal.description}</Text>
 
-      <View style={styles.progressContainer}>
+      <View
+        style={styles.progressContainer}
+        accessibilityRole="progressbar"
+        accessibilityLabel="Boss Battle Progress"
+        accessibilityValue={{ min: 0, max: 100, now: Math.min(progress, 100) }}
+      >
         <View style={[styles.progressBar, { width: `${Math.min(progress, 100)}%` }]} />
       </View>
 
