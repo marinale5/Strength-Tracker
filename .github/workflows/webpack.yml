@@ -22,7 +22,23 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
 
-    - name: Build
+    - uses: pnpm/action-setup@v4
+      with:
+        version: 10
+
+    - name: Install dependencies
       run: |
-        npm install
-        npx webpack
+        pnpm install
+        cd backend && pnpm install
+        cd ../frontend && pnpm install
+
+    - name: Run Backend Tests
+      run: |
+        cd backend
+        cp .env.example .env
+        pnpm exec jest tests/achievement.test.js
+
+    - name: Verify Backend Build
+      run: |
+        pnpm add -D webpack-cli
+        pnpm exec webpack --entry ./backend/src/server.js --mode production --target node
