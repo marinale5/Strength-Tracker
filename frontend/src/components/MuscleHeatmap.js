@@ -33,7 +33,12 @@ export default function MuscleHeatmap() {
           {data.map((item, index) => {
             const height = (parseFloat(item.total_volume) / maxVolume) * 150;
             return (
-              <View key={index} style={styles.barContainer}>
+              <View
+                key={index}
+                style={styles.barContainer}
+                accessibilityRole="image"
+                accessibilityLabel={`${item.muscle_group} volume: ${Math.floor(item.total_volume)} units`}
+              >
                 <View style={[styles.bar, { height: Math.max(height, 5) }]} />
                 <Text style={styles.label}>{item.muscle_group}</Text>
                 <Text style={styles.volume}>{Math.floor(item.total_volume/1000)}k</Text>
