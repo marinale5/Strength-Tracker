@@ -13,6 +13,7 @@ import { workoutAPI } from '../api/client';
 import RestTimer from '../components/RestTimer';
 
 export default function LogWorkoutScreen({ onWorkoutLogged, route }) {
+  const { template } = route.params || {};
   const [loading, setLoading] = useState(false);
   const weightInput = useRef(null);
   const setsInput = useRef(null);

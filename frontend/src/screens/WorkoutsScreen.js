@@ -10,6 +10,7 @@ import {
   Alert,
 } from 'react-native';
 import { workoutAPI, gamificationAPI } from '../api/client';
+import BossBattle from '../components/BossBattle';
 
 export default function WorkoutsScreen() {
   const [workouts, setWorkouts] = useState([]);
@@ -96,12 +97,17 @@ export default function WorkoutsScreen() {
 
       <View style={styles.actionsRow}>
         <TouchableOpacity style={styles.actionButton}
-          onPress={() => handleShareWorkout(item.id)}>
+          onPress={() => handleShareWorkout(item.id)}
+          accessibilityRole="button"
+          accessibilityLabel={`Share ${item.exercise_name} workout`}
+        >
           <Text style={styles.actionText}>📤 Share</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.actionButton, styles.deleteButton]}
           onPress={() => handleDeleteWorkout(item.id)}
+          accessibilityRole="button"
+          accessibilityLabel={`Delete ${item.exercise_name} workout`}
         >
           <Text style={styles.actionText}>🗑️ Delete</Text>
         </TouchableOpacity>
